@@ -1,0 +1,106 @@
+columns:
+  - time: datetime64
+  - y: int64
+  - x1: float64
+  - x2: float64
+  - x3: float64
+  - x4: float64
+  - x5: float64
+  - x6: float64
+  - x7: float64
+  - x8: float64
+  - x9: float64
+  - x10: float64
+  - x11: float64
+  - x12: float64
+  - x13: float64
+  - x14: float64
+  - x15: float64
+  - x16: float64
+  - x17: float64
+  - x18: float64
+  - x19: float64
+  - x20: float64
+  - x21: float64
+  - x22: float64
+  - x23: float64
+  - x24: float64
+  - x25: float64
+  - x26: float64
+  - x27: float64
+  - x28: float64
+  - x29: float64
+  - x30: float64
+  - x31: float64
+  - x32: float64
+  - x33: float64
+  - x34: float64
+  - x35: float64
+  - x36: float64
+  - x37: float64
+  - x38: float64
+  - x39: float64
+  - x40: float64
+  - x41: float64
+  - x42: float64
+  - x43: float64
+  - x44: float64
+  - x45: float64
+  - x46: float64
+  - x47: float64
+  - x48: float64
+  - x49: float64
+  - x50: float64
+  - x51: float64
+  - x52: float64
+  - x53: float64
+  - x54: float64
+  - x55: float64
+  - x56: float64
+  - x57: float64
+  - x58: float64
+  - x59: float64
+  - x60: float64
+  - y.1: int64
+
+  
+numerical_columns:
+  - no_of_employees
+  - prevailing_wage
+  - yr_of_estab
+
+categorical_columns:
+  - case_id
+  - continent
+  - education_of_employee
+  - has_job_experience
+  - requires_job_training
+  - region_of_employment
+  - unit_of_wage
+  - full_time_position
+  - case_status
+
+drop_columns:
+  - case_id
+  - yr_of_estab
+
+# for data transformation
+num_features:
+  - no_of_employees
+  - prevailing_wage
+  - company_age
+
+or_columns:
+  - has_job_experience
+  - requires_job_training
+  - full_time_position
+  - education_of_employee
+
+oh_columns:
+  - continent
+  - unit_of_wage
+  - region_of_employment
+
+transform_columns:
+  - no_of_employees
+  - company_age

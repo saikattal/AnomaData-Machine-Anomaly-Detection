@@ -1,0 +1,17 @@
+ipykernel
+openpyxl
+pandas
+pymongo
+numpy
+matplotlib
+plotly
+seaborn
+scipy
+scikit-learn
+imblearn
+xgboost
+python-dotenv
+dill
+PyYAML
+evidently==0.2.8
+-e .
