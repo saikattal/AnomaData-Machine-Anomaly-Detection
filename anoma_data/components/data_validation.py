@@ -2,14 +2,13 @@ import json
 import sys
 
 import pandas as pd
-from evidently.model_profile import Profile
-from evidently.model_profile.sections import DataDriftProfileSection
+
 
 from pandas import DataFrame
 
 from anoma_data.exception import AnomaDataException
 from anoma_data.logger import logging
-from anoma_data.utils.main_utils import read_yaml_file, write_yaml_file
+from anoma_data.utils.main_utils import read_yaml_file
 from anoma_data.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
 from anoma_data.entity.config_entity import DataValidationConfig
 from anoma_data.constants import SCHEMA_FILE_PATH
@@ -38,7 +37,8 @@ class DataValidation:
         """
         try:
             status = len(dataframe.columns) == len(self._schema_config["columns"])
-            logging.info(f"Is required column present: [{status}]")
+            
+            #logging.info(f"Is required number of column present okay?: [{status}]")
             return status
         except Exception as e:
             raise AnomaDataException(e, sys)
@@ -52,25 +52,19 @@ class DataValidation:
         On Failure  :   Write an exception log and then raise an exception
         """
         try:
-            dataframe_columns = df.columns
-            missing_numerical_columns = []
-            missing_categorical_columns = []
-            for column in self._schema_config["numerical_columns"]:
-                if column not in dataframe_columns:
-                    missing_numerical_columns.append(column)
+            dataframe_feature_columns = df.drop(['y','y.1'],axis=1).columns
+           
 
-            if len(missing_numerical_columns)>0:
-                logging.info(f"Missing numerical column: {missing_numerical_columns}")
+            missing_columns = []
+            #missing_categorical_columns = []
+            for column in self._schema_config["feature_columns"]:
+                if column not in dataframe_feature_columns:
+                    missing_columns.append(column)
 
+            if len(missing_columns)>0:
+                logging.info(f"Missing column: {missing_columns}")
 
-            for column in self._schema_config["categorical_columns"]:
-                if column not in dataframe_columns:
-                    missing_categorical_columns.append(column)
-
-            if len(missing_categorical_columns)>0:
-                logging.info(f"Missing categorical column: {missing_categorical_columns}")
-
-            return False if len(missing_categorical_columns)>0 or len(missing_numerical_columns)>0 else True
+            return False if len(missing_columns)>0 else True
         except Exception as e:
             raise AnomaDataException(e, sys) from e
 
@@ -80,33 +74,8 @@ class DataValidation:
             return pd.read_csv(file_path)
         except Exception as e:
             raise AnomaDataException(e, sys)
-
-    def detect_dataset_drift(self, reference_df: DataFrame, current_df: DataFrame, ) -> bool:
-        """
-        Method Name :   detect_dataset_drift
-        Description :   This method validates if drift is detected
         
-        Output      :   Returns bool value based on validation results
-        On Failure  :   Write an exception log and then raise an exception
-        """
-        try:
-            data_drift_profile = Profile(sections=[DataDriftProfileSection()])
-
-            data_drift_profile.calculate(reference_df, current_df)
-
-            report = data_drift_profile.json()
-            json_report = json.loads(report)
-
-            write_yaml_file(file_path=self.data_validation_config.drift_report_file_path, content=json_report)
-
-            n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
-            n_drifted_features = json_report["data_drift"]["data"]["metrics"]["n_drifted_features"]
-
-            logging.info(f"{n_drifted_features}/{n_features} drift detected.")
-            drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
-            return drift_status
-        except Exception as e:
-            raise AnomaDataException(e, sys) from e
+   
 
     def initiate_data_validation(self) -> DataValidationArtifact:
         """
@@ -124,41 +93,39 @@ class DataValidation:
                                  DataValidation.read_data(file_path=self.data_ingestion_artifact.test_file_path))
 
             status = self.validate_number_of_columns(dataframe=train_df)
-            logging.info(f"All required columns present in training dataframe: {status}")
+            logging.info(f"Number of columns present in training dataframe okay?: {status}")
             if not status:
                 validation_error_msg += f"Columns are missing in training dataframe."
             status = self.validate_number_of_columns(dataframe=test_df)
 
-            logging.info(f"All required columns present in testing dataframe: {status}")
+            logging.info(f"Number of columns present in test dataframe okay?: {status}")
             if not status:
                 validation_error_msg += f"Columns are missing in test dataframe."
 
             status = self.is_column_exist(df=train_df)
+            logging.info(f"All required columns present in training dataframe status: {status}")
 
             if not status:
                 validation_error_msg += f"Columns are missing in training dataframe."
+
             status = self.is_column_exist(df=test_df)
+            logging.info(f"All required columns present in test dataframe: {status}")
 
             if not status:
                 validation_error_msg += f"columns are missing in test dataframe."
 
             validation_status = len(validation_error_msg) == 0
+            logging.info(f'Validation status: {validation_status}')
+            
 
-            if validation_status:
-                drift_status = self.detect_dataset_drift(train_df, test_df)
-                if drift_status:
-                    logging.info(f"Drift detected.")
-                    validation_error_msg = "Drift detected"
-                else:
-                    validation_error_msg = "Drift not detected"
-            else:
+            if not validation_status: 
                 logging.info(f"Validation_error: {validation_error_msg}")
                 
 
             data_validation_artifact = DataValidationArtifact(
                 validation_status=validation_status,
-                message=validation_error_msg,
-                drift_report_file_path=self.data_validation_config.drift_report_file_path
+                message=validation_error_msg
+                
             )
 
             logging.info(f"Data validation artifact: {data_validation_artifact}")
