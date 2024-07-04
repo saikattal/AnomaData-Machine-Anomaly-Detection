@@ -7,51 +7,44 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-image: url('static/equipment.jpg'); /* Replace with your image path */
+            background: url('/static/equipment.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
+            margin: 20px;
         }
         .container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
         }
         h1 {
-            margin-bottom: 20px;
+            text-align: center;
             color: #333;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
         }
         .form-group input[type="file"] {
-            display: block;
-            margin: 0 auto 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         .form-group button {
-            padding: 10px 20px;
-            margin: 5px;
+            width: 100%;
+            padding: 10px;
             background-color: #007BFF;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
         .form-group button:hover {
             background-color: #0056b3;
@@ -61,31 +54,30 @@
             font-weight: bold;
             color: #333;
         }
-        .footer {
-            margin-top: 30px;
-            font-size: 0.8em;
-            color: #888;
+        .first-prediction {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9e9e9;
+            border-radius: 4px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>AnomaData</h1>
-        <h3><i>A Machine Anomaly Data Prediction Application</i></h3>
+        <h4><i>(Automated Machine Anomaly Detection Application)</i></h4>
+        <h5><i>Note: Please train model only if necessary! </i></h5>
         <div class="form-group">
-            <label for="file-input">Select Data as CSV File:</label>
+            <label for="file-input">Select CSV File with input data:</label>
             <input type="file" id="file-input" accept=".csv" required>
         </div>
         <div class="form-group">
-            <button onclick="predictFile()">Predict</button>
-            <button onclick="trainModel()">Train Model</button>
+            <button onclick="predictFile()">Get Predictions</button>
+            <button onclick="trainModel()">Train Model </button>
         </div>
-        <div class="status" id="status">
-            <!-- Placeholder for status update -->
-        </div>
-        <div class="footer">
-            AnomaData &copy; 2024
-        </div>
+        <div class="status" id="status"></div>
+        <div class="first-prediction" id="first-prediction"></div>
     </div>
     <script>
         async function predictFile() {
@@ -108,7 +100,9 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    document.getElementById('status').textContent = result.status;
+                    document.getElementById('status').textContent = result.message;
+                    const firstPrediction = JSON.stringify(result.first_prediction, null, 2);
+                    document.getElementById('first-prediction').textContent = `First Prediction:\n${firstPrediction}`;
                 } else {
                     document.getElementById('status').textContent = result.error;
                 }
@@ -121,13 +115,8 @@
         async function trainModel() {
             try {
                 const response = await fetch('/train', { method: 'GET' });
-                const result = await response.json();
-                
-                if (response.ok) {
-                    document.getElementById('status').textContent = result.message;
-                } else {
-                    document.getElementById('status').textContent = result.error;
-                }
+                const result = await response.text();
+                document.getElementById('status').textContent = result;
             } catch (error) {
                 console.error('Error during training:', error);
                 document.getElementById('status').textContent = 'Error during training. Please try again.';

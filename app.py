@@ -8,6 +8,7 @@ from uvicorn import run as app_run
 import pandas as pd
 import io
 from typing import Optional
+import os
 
 from anoma_data.constants import APP_HOST, APP_PORT
 from anoma_data.pipeline.prediction_pipeline import AnomaData, AnomaDataClassifier
@@ -54,24 +55,48 @@ async def trainRouteClient():
 async def upload_file(request: Request, file: UploadFile = File(...)):
     try:
         contents = await file.read()
-        
+        data=pd.read_csv(io.StringIO(contents.decode('utf-8')))
         # Process the uploaded CSV file
         anoma_data = AnomaData()
         df = anoma_data.get_anomadata_input_data_frame(contents=io.StringIO(contents.decode('utf-8')))
         
         # Perform prediction
         model_predictor = AnomaDataClassifier()
-        value = model_predictor.predict(dataframe=df)[0]
-        
+        #value = model_predictor.predict(dataframe=df)[0]
+        results = model_predictor.predict(dataframe=df)
+        anoma_df=pd.concat([data['time'],
+                            df,
+                            pd.DataFrame(results, columns=['Predictions'])],axis=1)
+        anoma_df['Predictions']=anoma_df['Predictions'].map({0:'No Anomaly Detected',1:'Anomaly Detected'})
+
+        output_path = "static/predictions.csv" 
+        anoma_df.to_csv(output_path,index=False)
         # Determine prediction status
-        status = "Anomaly detected" if value == 1 else "No anomaly detected"
+        """status = "Anomaly detected" if value == 1 else "No anomaly detected"
         
         # Log prediction result
-        logging.info(f"Prediction status: {status}")
+        logging.info(f"Prediction status: {status}")"""
+
+        # Get the first prediction row as JSON
+        first_prediction_row = anoma_df.iloc[0].to_dict()
+        
+        # Return the response
+        response_data = {
+            "message": "Prediction complete. Check the predictions.csv file in the static folder. Here's the prediction of the first row",
+            "first_prediction": first_prediction_row
+        }
+        
+        return JSONResponse(content=response_data)
         
         # Render template with prediction result
         #return templates.TemplateResponse("anomadata.html", {"request": request, "context": status})
-        return JSONResponse(content={"status": status})
+        #return JSONResponse(content={"status": status})
+         # Returning the response
+        """return templates.TemplateResponse(
+            "anomadata.html",
+            {"request": request, "context": "Prediction complete. Check the predictions.csv file in the static folder."},
+        )"""
+    
 
     except Exception as e:
         logging.error(f"Error during prediction: {e}")

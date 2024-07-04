@@ -10,7 +10,7 @@ from anoma_data.exception import AnomaDataException
 from anoma_data.logger import logging
 from anoma_data.utils.main_utils import read_yaml_file
 
-from anoma_data.constants import SCHEMA_FILE_PATH
+from anoma_data.constants import PREDICTION_SCHEMA_FILE_PATH
 
 
 class PredictionDataValidation:
@@ -19,7 +19,7 @@ class PredictionDataValidation:
         
         try:
            
-            self._schema_config =read_yaml_file(file_path=SCHEMA_FILE_PATH)
+            self._schema_config =read_yaml_file(file_path=PREDICTION_SCHEMA_FILE_PATH)
         except Exception as e:
             raise AnomaDataException(e,sys)
 
@@ -48,7 +48,7 @@ class PredictionDataValidation:
         On Failure  :   Write an exception log and then raise an exception
         """
         try:
-            dataframe_feature_columns = df.drop(['y','y.1'],axis=1).columns
+            dataframe_feature_columns = df.drop(['y.1'],axis=1).columns
            
 
             missing_columns = []

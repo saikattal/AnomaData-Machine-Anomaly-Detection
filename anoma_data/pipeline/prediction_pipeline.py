@@ -9,7 +9,7 @@ from anoma_data.exception import AnomaDataException
 from anoma_data.logger import logging
 from anoma_data.utils.main_utils import read_yaml_file,drop_columns
 from pandas import DataFrame
-from anoma_data.constants import SCHEMA_FILE_PATH
+from anoma_data.constants import PREDICTION_SCHEMA_FILE_PATH
 from anoma_data.components.prediction_data_validation import PredictionDataValidation
 
 
@@ -23,7 +23,7 @@ class AnomaData:
         """
         try:
             
-            self._schema_config =read_yaml_file(file_path=SCHEMA_FILE_PATH)
+            self._schema_config =read_yaml_file(file_path=PREDICTION_SCHEMA_FILE_PATH)
            
 
 

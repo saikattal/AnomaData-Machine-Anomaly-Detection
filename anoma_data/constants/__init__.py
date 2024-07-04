@@ -22,6 +22,7 @@ FILE_NAME: str = "anomadata.csv"
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
 SCHEMA_FILE_PATH = os.path.join("config", "schema.yaml")
+PREDICTION_SCHEMA_FILE_PATH = os.path.join("config", "prediction_schema.yaml")
 
 
 AWS_ACCESS_KEY_ID_ENV_KEY = os.getenv("AWS_ACCESS_KEY_ID")
@@ -75,5 +76,3 @@ MODEL_PUSHER_S3_KEY = "model-registry"
 APP_HOST = "0.0.0.0"
 APP_PORT = 8080
 
-RESULTS_DIR: str = "results"
-RESULTS_FILE_NAME: str = "results.csv"
