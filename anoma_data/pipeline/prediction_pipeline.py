@@ -1,6 +1,6 @@
 import os
 import sys
-
+import io
 import numpy as np
 import pandas as pd
 from anoma_data.entity.config_entity import AnomaDataPredictorConfig
@@ -14,15 +14,15 @@ from anoma_data.components.prediction_data_validation import PredictionDataValid
 
 
 class AnomaData:
-    def __init__(self, path
-               
+    def __init__(self
+             
         ):
         """
         Anoma Data constructor
         Input: all features of the trained model for prediction
         """
         try:
-            self.path=path
+            
             self._schema_config =read_yaml_file(file_path=SCHEMA_FILE_PATH)
            
 
@@ -35,14 +35,15 @@ class AnomaData:
         anomadata_input_df=drop_columns(anomadata_input_df,drop_cols)
         return anomadata_input_df
 
-    def get_anomadata_input_data_frame(self)-> DataFrame:
+    def get_anomadata_input_data_frame(self,contents)-> DataFrame:
         """
         This function returns a DataFrame from AnomaData class input
         """
         try:
             
             #anomadata_input_dict = self.get_anoma_data_as_dict()
-            anomadata_input_df=pd.read_csv(self.path)
+            anomadata_input_df=pd.read_csv(contents)
+            #anomadata_input_df = pd.read_csv(io.BytesIO(contents))
             validation_error_msg = ""
             status=PredictionDataValidation().validate_number_of_columns(anomadata_input_df)
             if not status:
