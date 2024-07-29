@@ -165,12 +165,15 @@ class DataTransformation:
                 logging.info(
                     "Applying preprocessing object on training dataframe and testing dataframe"
                 )
+                
 
                 input_feature_train_arr = preprocessor.fit_transform(input_feature_train_df)
 
                 logging.info(
                     "Used the preprocessor object to fit transform the train features"
                 )
+
+                # Note: We can create a different preprocessor with test skewed column as the parameter
 
                 input_feature_test_arr = preprocessor.transform(input_feature_test_df)
 

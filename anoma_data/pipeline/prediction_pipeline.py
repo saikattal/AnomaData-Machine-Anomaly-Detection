@@ -33,6 +33,7 @@ class AnomaData:
     def data_transform(self,anomadata_input_df)-> DataFrame:
         drop_cols = self._schema_config['drop_columns']
         anomadata_input_df=drop_columns(anomadata_input_df,drop_cols)
+        # We can handle skewness and also apply scaling to the data
         return anomadata_input_df
 
     def get_anomadata_input_data_frame(self,contents)-> DataFrame:
