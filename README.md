@@ -11,3 +11,7 @@ This Capstone project is aimed at predicting the machine breakdown by identifyin
 The data we have contains about 18000+ rows collected over few days. The column ‘y’ contains the binary labels, with 1 denoting there is an anomaly. The rest of the columns are predictors.
 
 **This application is a complete end-to-end production grade FastAPI application. It has a user interface to choose csv file containing the input data and getting predictions and also training the model.**
+
+![alt text](image.png)
+
+![alt text](image-1.png)
